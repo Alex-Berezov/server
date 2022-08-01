@@ -1,8 +1,10 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
-
+import { graphqlHTTP } from 'express-graphql'
 import router from './routes/post.routes.js'
+import root from './graphql/resolvers/index.js'
+import schema from './graphql/schema/index.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -12,6 +14,13 @@ const dbConnect = 'mongodb+srv://aleber:farizda1990@cluster0.rdz49.mongodb.net/b
 app.use(express.json({extended: true}))
 app.use(cors())
 app.use('/api/post', router)
+
+app.use('/graphql', graphqlHTTP({
+  graphiql: true,
+  rootValue: root,
+  schema
+}))
+
 
 const start = async () => {
   try {
