@@ -7,16 +7,16 @@ const root = {
       return postsFetched.map(post => {
         return {
           ...post._doc,
-          _id: post.id
+          postSlug: post.postSlug
         }
       })
     } catch (error) {
       console.log('Get posts error on server >>', error)
     }
   },
-  getPost: async ({ id }) => {
+  getPost: async ({ postSlug }) => {
     try {
-      const postFetched = await Post.findById(id)
+      const postFetched = await Post.findOne({postSlug})
       return postFetched
     } catch (error) {
       console.log('Get single post error on server >>', error)
@@ -25,19 +25,24 @@ const root = {
   addPost: async ({ input }) => {
     try {
       const { title, text, imgUrl } = input
-      const post = new Post({ title, text, imgUrl })
+      const postSlug = title.toLowerCase().split(' ').join('-')
+
+      const postFetched = await Post.findOne({postSlug}) // Разобраться, как возвращать ошибку по правильному
+      if (postFetched) return console.log('Post already exist')
+
+      const post = new Post({ postSlug, title, text, imgUrl })
       const newPost = await post.save()
-      return { ...newPost._doc, _id: newPost.id }
+      return { ...newPost._doc, postSlug: newPost.postSlug }
     } catch (error) {
       console.log('Add post error on server >>', error)
     }
   },
-  deletePost: async ({ _id }) => {
+  deletePost: async ({ postSlug }) => {
     try {
-      const deletedPost = await Post.findByIdAndDelete(_id);
+      const deletedPost = await Post.findByIdAndDelete(postSlug);
       return {
         ...deletedPost._doc,
-        _id: deletedPost.id,
+        postSlug: deletedPost.postSlug,
       }
     } catch (error) {
       console.log('Delete post error on server >>', error)

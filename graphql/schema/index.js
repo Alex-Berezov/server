@@ -3,12 +3,14 @@ import { buildSchema } from 'graphql'
 const schema = buildSchema(`
   type Post {
     _id: ID
+    postSlug: String
     title: String
     text: String
     imgUrl: String
   }
 
   input PostInput {
+    postSlug: String
     title: String
     text: String
     imgUrl: String
@@ -16,12 +18,12 @@ const schema = buildSchema(`
 
   type Mutation {
     addPost(input: PostInput): Post,
-    deletePost(_id: String): Post,
+    deletePost(postSlug: String): Post,
   }
 
   type Query {
     getAllPosts: [Post!]
-    getPost(id: ID): Post
+    getPost(postSlug: String): Post
   }
 `)
 
